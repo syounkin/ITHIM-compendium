@@ -16,15 +16,47 @@
 
 Jason, you can insert \LaTeX{} code in between R chunks.
 
-
-
 <<library>>=
 library("ITHIM")
 @
 
 \section{Comparative Risk Assesment}
 
+The ITHIM model is built on the comparitive risk assesment framework
+in which the population atrributable fraction (AF) is computed as follows.
+
 $$\mathrm{AF} = \frac{\int R(x)P(x) dx  - \int R(x)Q(x) dx }{\int R(x)P(x) dx}$$
+
+$R(x)$ is the risk of disease given exposure $x$, and is relative to
+the risk when there is no exposure $x=0$.  $P(x)$ is the population
+density function for $x$ given the baseline scenario.  $Q(x)$ is the
+population density function given the alternat scenario.
+
+\subsection{ITHIM Implementation}
+
+We assume that active transport is log-normal within strata with
+constant coefficient of variation and differing mean across strata.
+We compute the mean time walking, and cycling for each strata given
+the travel parameters.  Then we compute quintiles, but not really
+quintiles because they occur at 10\%, 30\%, 50\%, 70\%, 90\%, not how
+I believe they are typically defined.  Thes values are used to center
+the rectangles used to approximate the integral.
+
+\section{Non-Travel METs}
+
+Let's treat this the same way we do the rest of the model.  Let's
+assue that total MET expenditure is ditributed log-normally.  Let's
+define a relative energy usage matrix and an overall mean.  Non-travel
+METs is then the difference between overall MET estimate and travel
+METs from the model.  These values are then used in the alternate
+scenario.  In fact we could add a parameter to attenuate the gain in
+METs.  We do this to allow for the fact that not all of the travel
+energy is retained, some non-travel energy  decrease may occur.
+
+\section{Individual-Level Travel Data}
+
+From a travel survey we can estimate parameters needed to simulate
+data.
 
 <<sessionInfo>>=
 sessionInfo()
