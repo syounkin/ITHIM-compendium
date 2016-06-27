@@ -14,9 +14,17 @@
  pdfstartview={XYZ null null 1}}
 \begin{document}
 
+Jason, you can insert \LaTeX{} code in between R chunks.
+
+
+
 <<library>>=
 library("ITHIM")
 @
+
+\section{Comparative Risk Assesment}
+
+$$\mathrm{AF} = \frac{\int R(x)P(x) dx  - \int R(x)Q(x) dx }{\int R(x)P(x) dx}$$
 
 <<sessionInfo>>=
 sessionInfo()
