@@ -16,9 +16,57 @@
 
 Jason, you can insert \LaTeX{} code in between R chunks.
 
+\section{ITHIM R Package}
+
 <<library>>=
 library("ITHIM")
 @
+
+\section{Total METs}
+
+The ITHIM model is based on the result that an increase in energy
+expenditure decreases risk for a set of diseases.  We model the energy
+expenditure as the sum of two random variables, travel- and
+non-travel-related energy expenditure.  Furthermore the travel-related
+energy expenditure is modeled as a function of active transport time.
+
+\subsection{Travel-Related Energy Expenditure}
+
+We assume that the within-strata active transport time is distributed
+as a log-normal random variable.  From that we estimate travel-related
+energy expenditure using proportion of time cycling and MET levels for
+cycling and walking.
+
+\subsubsection{Mixture Distribution}
+
+I propose we model the travel and non-travel METs as a mixture of a
+point-mass at zero and a log-normal distribution for non-zero values.
+
+
+
+
+\begin{quotation}
+We need the distribution of the exposure variable, total METs.  So we
+need the distribution of the sum of two random variables, travel and
+non-travel METs.  In the EXCEL workbook this is achieved by summing
+quintiles for travel and non-travel METs, but this is not correct.
+Consider the fact that we make no claim about the correlation between
+travel and non-travel METs.  (Surely there must be positive
+correlation.)  Even if we assumed they were independent we cannot
+simply add quintiles.  I'll post an R snippet with a counterexample.
+
+The solution is to simulate the two underlying distributions (travel
+and non-travel METs, or total METs and increase in travel METs).  Then
+compute an empirical distribution for total METs.  This allows us to
+introduce a few new parameters to the model.  For instance we could
+treat the distribution of non-travel METs as a mixture of a point mass
+at zero and a log-normal distribution for non-zero values.  (Same with
+active transport time.) Thus we would be able to control the
+proportion of active people in a given city.  We could argue that this
+will change from city to city, but the underlying shape of the
+distribution will remain constant.  Also, we could introduce
+correlation between travel and non-travel METs.
+\end{quotation}
 
 \section{Comparative Risk Assesment}
 
