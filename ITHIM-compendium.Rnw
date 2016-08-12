@@ -14,12 +14,149 @@
  pdfstartview={XYZ null null 1}}
 \begin{document}
 
-Jason, you can insert \LaTeX{} code in between R chunks.
+\section{ITHIM R Package}
 
-<<library>>=
+Welcome to the ITHIM compendium where we attempt to describe both the
+R package and ITHIM model in detail.  We begin with the R package.
+
+\subsection{Quick Start}
+
+Let's examine a simple example and breakdown the steps later.  Start
+by installing the package from the GitHub repository.  To do so you
+need th epackage ``devtools.''  This can be easily installed from the
+CRAN repository using \texttt{install\_packages("devtools")}.
+
+<<install, warning = FALSE, message = FALSE, warning = FALSE, error = FALSE, results = "hide">>=
+library("devtools")
+install_github(repo = "syounkin/ITHIM")
 library("ITHIM")
 @
 
+Each vision (region and scenario) is considered an ITHIM object. We
+have hard-coded into the package the parameter sets for a few regions,
+e.g., the national data set.  So we could create an ITHIM object for
+the baseline and for the scenario and compare.
+
+<<national>>=
+ITHIM.baseline <- createITHIM(vision = "baseline", region = "national")
+ITHIM.scenario <- createITHIM(vision = "scenario", region = "national")
+comparativeRisk <- compareModels(ITHIM.baseline, ITHIM.scenario)
+@
+
+Now let's examine the population attributable fraction for colon
+cancer stratified by age and sex.
+
+<<colon>>=
+comparativeRisk$AF$ColonCancer
+@
+
+So, clearly a lot is happening behind the curtain.  Let's look at it
+more closely.
+
+\subsection{ITHIM Object}
+
+Although we have not formally defined an ITHIM object it is helpful to
+think in these terms nonetheless.  If all goes well I plan to
+formalize the ITHIM class in the package.  Informally define the ITHIM
+object as a list with three elements, ``parameters'', ``means'' and
+``quintiles.''  The ``parameters'' element contains the list of model
+parameters, and likewise for ``means'' and ``quintiles.''
+
+<<object, echo = TRUE>>=
+names(ITHIM.baseline)
+names(ITHIM.baseline$parameters)
+@
+
+First note that some of the parameters listed are defunct for one
+reason or another.  I'll try to come back and clean all of that out
+later, but for now let's get the flow established.
+
+Let's look at how the ITHIM object is created.
+
+\subsection{createITHIM()}
+
+Let's print out the function for inspection.
+
+<<created>>=
+createITHIM
+@
+
+We see that it takes two arguments, ``vision'' and ``region'', and with these it
+creates the parameter set.  Then the means are computed using the
+parameters and finally the quintiles are computed using the means and
+parameters.  This is all done with three functions, namely,
+``createParameterList'', ``computeMeanMatrices'', ``getQuintiles.''
+
+\subsubsection{createParameterList()}
+We print out the function for inspection and notice that yet another
+two functions are being called, ``createRegionalParameters'' and ``readGBD.''
+
+\subsubsection{createRegionalParameters()}
+This is where the regional parameters are hard-coded.
+\subsubsection{readGBD()}
+The burden measures for two regions, ``national'' and ``SFBayArea'',
+are defined in two files contained within the package.  So they are
+also hard-coded (in a sense).  The function "readGBD'' simply reads
+these data in.
+
+<<createParameter>>=
+createParameterList
+@
+
+\subsubsection{computeMeanMatrices()}
+
+Computing the means once the parameters are in place is not
+difficult.  Here is the code.
+
+<<computeMeanMatrices>>=
+computeMeanMatrices
+@
+
+Simply adding and multiplying walking and cycling matrices to get total
+
+\subsubsection{getQuintiles()}
+
+Now we compute the quintiles for several statistics, but ultimately we
+want the quintiles for total exposure, which is the sum of two random
+variables.  So we simulate a sample from the travel and the non-travel
+distributions and sum them up.  To do all this we define three functions.
+
+<<getQuintiles>>=
+getQuintiles
+@
+
+\subsubsection{getTotalDistribution()}
+<<getTotalDistribution>>=
+getTotalDistribution
+@
+
+\subsubsection{getTravelDistribution()}
+<<getTravelDistribution>>=
+getTravelDistribution
+@
+
+\subsubsection{getNonTravelDistribution()}
+<<getNonTravelDistribution>>=
+getNonTravelDistribution
+@
+
+\subsection{Comparative Risk Assesment}
+
+The final step of the process is to compare the two models with
+``compareModels.''  This part gets tricky as we need to compare across
+multiple diseases.  To do this we create a list named by disease and
+apply functions element-wise.  It boils down to a lot of book-keeping
+and use of ``mapply'' and ``lapply,'' two R functions that apply
+functions to each element of a list or pair of lists.
+
+\subsection{compareModels}
+<<compareModels>>=
+compareModels
+@
+
+\subsubsection{createActiveTransportRRs()}
+
+\clearpage
 \section{Comparative Risk Assesment}
 
 The ITHIM model is built on the comparitive risk assesment framework
